@@ -2,13 +2,12 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 
 const History = () => {
-  const [activeTab, setActiveTab] = useState('transaksi'); // Default tab: transaksi
+  const [activeTab, setActiveTab] = useState('transaksi');
   const [transaksi, setTransaksi] = useState([]);
   const [detailTransaksi, setDetailTransaksi] = useState([]);
 
-  const baseURL = import.meta.env.VITE_BASE_URL; // Base URL dari .env
+  const baseURL = import.meta.env.VITE_BASE_URL;
 
-  // Fetch data berdasarkan tab yang aktif
   useEffect(() => {
     if (activeTab === 'transaksi') {
       fetchTransaksi();
@@ -20,7 +19,7 @@ const History = () => {
   const fetchTransaksi = async () => {
     try {
       const response = await axios.get(`${baseURL}/api/transaksi`);
-      setTransaksi(response.data.data); // Simpan data transaksi
+      setTransaksi(response.data.data);
     } catch (error) {
       console.error('Error fetching transaksi:', error);
     }
@@ -29,7 +28,7 @@ const History = () => {
   const fetchDetailTransaksi = async () => {
     try {
       const response = await axios.get(`${baseURL}/api/history`);
-      setDetailTransaksi(response.data.data); // Simpan data detail transaksi
+      setDetailTransaksi(response.data.data);
     } catch (error) {
       console.error('Error fetching detail transaksi:', error);
     }
@@ -39,7 +38,6 @@ const History = () => {
     <div className="p-4">
       <h1 className="font-bold text-lg">Riwayat Transaksi</h1>
 
-      {/* Tabs */}
       <div role="tablist" className="tabs tabs-boxed">
         <a
           role="tab"
@@ -57,30 +55,46 @@ const History = () => {
         </a>
       </div>
 
-      {/* Konten berdasarkan tab */}
       <div className="mt-4">
         {activeTab === 'transaksi' && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {transaksi.map((trx) => (
-              <div key={trx.id} className="card bg-base-100 shadow-md p-4">
-                {/*<h2 className="font-semibold text-lg">Kode: {trx.kode}</h2>*/}
-                <p>Grand Total: Rp {trx.grand_total.toLocaleString()}</p>
-                <p>Pembayaran <div className="badge badge-primary">{trx.metode_pembayaran.nama}</div>  bayar <div className="badge badge-success">{trx.metode_pembelian.nama}</div> </p>
-                <p>Tanggal: {new Date(trx.created_at).toLocaleString()}</p>
+              <div key={trx.id} className="card relative bg-base-100 shadow-md border-t-2 border-green-600 border-l-4 p-4">
+                <p>
+                  Menu{" "}
+                  <div className="">
+                    {trx.detail_transaksi.slice(0, 3).map((detail, index) =>
+                      `Produk ${detail.produk_id}` + (index < Math.min(trx.detail_transaksi.length, 3) - 1 ? " + " : "")
+                    )}
+                  </div>
+                </p>
+                <p className="absolute top-2 right-3">
+                  {new Date(trx.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                </p>
+                <p>Grand Total: Rp {parseInt(trx.grand_total).toLocaleString()}</p>
+                <p>
+                  Pembayaran{" "}
+                  <div className="badge badge-primary">
+                    {trx.metode_pembayaran.nama}
+                  </div>{" "}
+                  bayar{" "}
+                  <div className="badge badge-success">
+                    {trx.metode_pembelian.nama}
+                  </div>
+                </p>
               </div>
             ))}
           </div>
         )}
 
         {activeTab === 'detail' && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3  gap-4">
             {detailTransaksi.map((detail) => (
-              <div key={detail.id} className="card bg-base-100 shadow-md p-4">
-                <h2 className="font-semibold text-lg">{detail.produk.nama}</h2>
-
+              <div key={detail.id} className="card relative border-t-2 border-l-4 border-green-600 bg-base-100 shadow-md mt-2 p-4">
+                <p>Produk ID: {detail.produk_id}</p>
                 <p>Jumlah: {detail.qty}</p>
-                <p>Subtotal: Rp {detail.subtotal.toLocaleString()}</p>
-                <p>Tanggal: {new Date(detail.created_at).toLocaleString()}</p>
+                <p>Subtotal: Rp {parseInt(detail.subtotal).toLocaleString()}</p>
+                <p className='absolute top-2 right-3'> {new Date(detail.created_at).toLocaleString([], { hour: '2-digit', minute: '2-digit' })}</p>
               </div>
             ))}
           </div>

@@ -3,6 +3,7 @@ import axios from 'axios';
 import ProductCard from '../components/ProductCard';
 import Skeleton from 'react-loading-skeleton';
 import TransaksiModal from '../components/TransaksiModal';
+import Swal from 'sweetalert2';
 
 const Transaksi = () => {
   const [products, setProducts] = useState([]);
@@ -13,27 +14,126 @@ const Transaksi = () => {
   const [purchaseMethods, setPurchaseMethods] = useState([]);
   const [selectedPurchaseMethod, setSelectedPurchaseMethod] = useState('');
   const [paymentMethods, setPaymentMethods] = useState([]);
-  const [isLoading, setIsLoading] = useState(true); // State untuk loading
+  const [isLoading, setIsLoading] = useState(true);
+  const [isOnline, setIsOnline] = useState(navigator.onLine);
 
   const baseURL = import.meta.env.VITE_BASE_URL;
 
-  // Fetch data produk menggunakan Axios
   useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const response = await axios.get(`${baseURL}/api/produk`);
-        setProducts(response.data.data);
-        setIsLoading(false); // Setelah data ter-fetch, set loading ke false
-      } catch (error) {
-        console.error('Error fetching products:', error);
-        setIsLoading(false); // Jika error, tetap matikan loading
-      }
+    const handleOnline = () => setIsOnline(true);
+    const handleOffline = () => setIsOnline(false);
+
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
     };
+  }, []);
 
+  useEffect(() => {
+    if (isOnline) {
+      syncPendingTransactions();
+    }
+  }, [isOnline]);
+
+  const fetchProducts = async () => {
+    try {
+      if (isOnline) {
+        const response = await axios.get(`${baseURL}/api/produk`);
+        const fetchedProducts = response.data.data;
+        setProducts(fetchedProducts);
+        localStorage.setItem('cachedProducts', JSON.stringify(fetchedProducts));
+        localStorage.setItem('lastProductsFetch', Date.now().toString());
+      } else {
+        const cachedProducts = localStorage.getItem('cachedProducts');
+        if (cachedProducts) {
+          setProducts(JSON.parse(cachedProducts));
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching products:', error);
+      const cachedProducts = localStorage.getItem('cachedProducts');
+      if (cachedProducts) {
+        setProducts(JSON.parse(cachedProducts));
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
     fetchProducts();
-  }, [baseURL]);
+  }, [baseURL, isOnline]);
 
-  // Skeleton loader
+  const fetchPurchaseMethods = async () => {
+    try {
+      let methods;
+      if (isOnline) {
+        const response = await axios.get(`${baseURL}/api/metode-pembelian`);
+        methods = response.data.data;
+        setPurchaseMethods(methods);
+        localStorage.setItem('cachedPurchaseMethods', JSON.stringify(methods));
+      } else {
+        const cachedMethods = localStorage.getItem('cachedPurchaseMethods');
+        if (cachedMethods) {
+          methods = JSON.parse(cachedMethods);
+          setPurchaseMethods(methods);
+        }
+      }
+
+      const defaultPurchaseMethod = methods.find((method) => method.nama.toLowerCase() === 'toko');
+      if (defaultPurchaseMethod) {
+        setSelectedPurchaseMethod(defaultPurchaseMethod.id);
+      }
+    } catch (error) {
+      console.error('Error fetching purchase methods:', error);
+      const cachedMethods = localStorage.getItem('cachedPurchaseMethods');
+      if (cachedMethods) {
+        setPurchaseMethods(JSON.parse(cachedMethods));
+      }
+    }
+  };
+
+  useEffect(() => {
+    fetchPurchaseMethods();
+  }, [baseURL, isOnline]);
+
+  const fetchPaymentMethods = async () => {
+    try {
+      let methods;
+      if (isOnline) {
+        const response = await fetch(`${baseURL}/api/metode-pembayaran`);
+        const data = await response.json();
+        methods = data.data;
+        setPaymentMethods(methods);
+        localStorage.setItem('cachedPaymentMethods', JSON.stringify(methods));
+      } else {
+        const cachedMethods = localStorage.getItem('cachedPaymentMethods');
+        if (cachedMethods) {
+          methods = JSON.parse(cachedMethods);
+          setPaymentMethods(methods);
+        }
+      }
+
+      const defaultPaymentMethod = methods.find((method) => method.nama.toLowerCase() === 'tunai');
+      if (defaultPaymentMethod) {
+        setPaymentMethod(defaultPaymentMethod.id);
+      }
+    } catch (error) {
+      console.error('Error fetching payment methods:', error);
+      const cachedMethods = localStorage.getItem('cachedPaymentMethods');
+      if (cachedMethods) {
+        setPaymentMethods(JSON.parse(cachedMethods));
+      }
+    }
+  };
+
+  useEffect(() => {
+    fetchPaymentMethods();
+  }, [baseURL, isOnline]);
+
   const renderSkeletons = () => {
     return Array(6).fill().map((_, index) => (
       <div key={index} className="bg-gray-200 p-4 rounded shadow-md">
@@ -43,48 +143,6 @@ const Transaksi = () => {
     ));
   };
 
-  // Fetch metode pembelian
-  useEffect(() => {
-    const fetchPurchaseMethods = async () => {
-      try {
-        const response = await axios.get(`${baseURL}/api/metode-pembelian`);
-        setPurchaseMethods(response.data.data);
-
-        // Set default metode pembelian ke "Toko"
-        const defaultPurchaseMethod = response.data.data.find((method) => method.nama.toLowerCase() === 'toko');
-        if (defaultPurchaseMethod) {
-          setSelectedPurchaseMethod(defaultPurchaseMethod.id);
-        }
-      } catch (error) {
-        console.error('Error fetching purchase methods:', error);
-      }
-    };
-
-    fetchPurchaseMethods();
-  }, [baseURL]);
-
-  // Fetch metode pembayaran
-  useEffect(() => {
-    const fetchPaymentMethods = async () => {
-      try {
-        const response = await fetch(`${baseURL}/api/metode-pembayaran`);
-        const data = await response.json();
-        setPaymentMethods(data.data);
-
-        // Set default metode pembayaran ke "Tunai"
-        const defaultPaymentMethod = data.data.find((method) => method.nama.toLowerCase() === 'tunai');
-        if (defaultPaymentMethod) {
-          setPaymentMethod(defaultPaymentMethod.id);
-        }
-      } catch (error) {
-        console.error('Error fetching payment methods:', error);
-      }
-    };
-
-    fetchPaymentMethods();
-  }, [baseURL]);
-
-  // Menambah produk ke keranjang
   const handleAddToCart = (id) => {
     setCart((prevCart) => ({
       ...prevCart,
@@ -93,7 +151,6 @@ const Transaksi = () => {
     setIsCartVisible(true);
   };
 
-  // Mengurangi produk dari keranjang
   const handleRemoveFromCart = (id) => {
     setCart((prevCart) => {
       if (prevCart[id] > 1) {
@@ -109,7 +166,6 @@ const Transaksi = () => {
     });
   };
 
-  // Menghitung total harga produk di keranjang
   const calculateTotal = () => {
     return products.reduce((total, product) => {
       const quantity = cart[product.id] || 0;
@@ -117,11 +173,10 @@ const Transaksi = () => {
     }, 0);
   };
 
-  // Mengonversi cart menjadi format untuk request body
   const createTransactionData = () => {
-    const produk_id = Object.keys(cart).map(Number); // Array produk_id
-    const jumlah = Object.values(cart); // Array jumlah produk
-    const total = calculateTotal(); // Total harga
+    const produk_id = Object.keys(cart).map(Number);
+    const jumlah = Object.values(cart);
+    const total = calculateTotal();
 
     return {
       produk_id,
@@ -132,31 +187,84 @@ const Transaksi = () => {
     };
   };
 
-  // Fungsi checkout
   const handleCheckOut = () => {
     setIsModalOpen(true);
   };
 
-  // Konfirmasi transaksi
+  const storePendingTransaction = (transactionData) => {
+    const pendingTransactions = JSON.parse(localStorage.getItem('pendingTransactions') || '[]');
+    pendingTransactions.push(transactionData);
+    localStorage.setItem('pendingTransactions', JSON.stringify(pendingTransactions));
+  };
+
+  const syncPendingTransactions = async () => {
+    const pendingTransactions = JSON.parse(localStorage.getItem('pendingTransactions') || '[]');
+    if (pendingTransactions.length === 0) return;
+
+    for (const transaction of pendingTransactions) {
+      try {
+        await axios.post(`${baseURL}/api/transaksi`, transaction);
+        // Remove the synced transaction from pendingTransactions
+        const updatedPendingTransactions = pendingTransactions.filter(t => t !== transaction);
+        localStorage.setItem('pendingTransactions', JSON.stringify(updatedPendingTransactions));
+      } catch (error) {
+        console.error('Error syncing transaction:', error);
+      }
+    }
+
+    Swal.fire({
+      icon: 'success',
+      title: 'Sinkronisasi Berhasil',
+      text: 'Transaksi pending telah berhasil disinkronkan.',
+    });
+  };
+
   const confirmTransaction = async () => {
     if (paymentMethod && selectedPurchaseMethod && Object.keys(cart).length > 0) {
       const transactionData = createTransactionData();
       console.log('Transaction Data:', transactionData);
 
-      try {
-        // Kirim POST request ke API transaksi
-        const response = await axios.post(`${baseURL}/api/transaksi`, transactionData);
-        console.log('Transaction Success:', response.data);
+      if (isOnline) {
+        try {
+          const response = await axios.post(`${baseURL}/api/transaksi`, transactionData);
+          console.log('Transaction Success:', response.data);
+          Swal.fire({
+            icon: 'success',
+            title: 'Transaksi Berhasil',
+            text: 'Terima kasih atas pembelian Anda!',
+          });
 
-        // Setelah konfirmasi, tutup modal dan reset state
+          // Reset state after successful transaction
+          setIsModalOpen(false);
+          setCart({});
+          setIsCartVisible(false);
+        } catch (error) {
+          console.error('Transaction Error:', error);
+          Swal.fire({
+            icon: 'error',
+            title: 'Transaksi Gagal',
+            text: 'Terjadi kesalahan saat memproses transaksi. Silakan coba lagi.',
+          });
+        }
+      } else {
+        storePendingTransaction(transactionData);
+        Swal.fire({
+          icon: 'info',
+          title: 'Transaksi Pending',
+          text: 'Transaksi Anda akan diproses saat koneksi internet tersedia.',
+        });
+
+        // Reset state after storing pending transaction
         setIsModalOpen(false);
         setCart({});
         setIsCartVisible(false);
-      } catch (error) {
-        console.error('Transaction Error:', error);
       }
     } else {
-      alert('Pilih metode pembayaran, pembelian, dan produk terlebih dahulu.');
+      Swal.fire({
+        icon: 'warning',
+        title: 'Informasi Tidak Lengkap',
+        text: 'Pilih metode pembayaran, pembelian, dan produk terlebih dahulu.',
+      });
     }
   };
 
@@ -165,7 +273,7 @@ const Transaksi = () => {
       <h1 className='mb-3 text-2xl font-bold'>Transaksi</h1>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 pb-72 gap-4">
         {isLoading ? (
-          renderSkeletons() // Tampilkan Skeleton saat isLoading = true
+          renderSkeletons()
         ) : (
           products.length > 0 ? (
             products.map((product) => (
@@ -212,7 +320,6 @@ const Transaksi = () => {
         setPaymentMethod={setPaymentMethod}
         onConfirm={confirmTransaction}
       />
-
     </div>
   );
 };

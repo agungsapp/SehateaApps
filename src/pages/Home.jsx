@@ -6,6 +6,7 @@ const Home = () => {
     total_cup: 0,
     saldo_cash: 0,
     saldo_online: 0,
+    pengeluaran: 0,
   });
 
   const baseURL = import.meta.env.VITE_BASE_URL;
@@ -31,7 +32,7 @@ const Home = () => {
         {/* Card for total cups sold */}
         <div className="card bg-orange-600 text-white col-span-2">
           <div className="card-body">
-            <h4 className="card-title text-center">Total Cup Terjual</h4>
+            <h4 className="card-title text-center text-base">Total Cup Terjual</h4>
             <div className="card-actions justify-center">
               <h5>{ringkasan.total_cup} Cup</h5>
             </div>
@@ -41,7 +42,7 @@ const Home = () => {
         {/* Card for cash balance */}
         <div className="card bg-green-600 text-white">
           <div className="card-body cursor-pointer">
-            <h4 className="card-title text-center">Uang Cash</h4>
+            <h4 className="card-title text-center text-base">Uang Cash</h4>
             <div className="card-actions justify-center">
               <h5>Rp. {ringkasan.saldo_cash.toLocaleString('id-ID')}</h5>
             </div>
@@ -51,9 +52,19 @@ const Home = () => {
         {/* Card for online balance */}
         <div className="card bg-blue-600 text-white">
           <div className="card-body cursor-pointer">
-            <h4 className="card-title text-center">Saldo Online</h4>
+            <h4 className="card-title text-center text-base">Saldo Online</h4>
             <div className="card-actions justify-center">
               <h5>Rp. {ringkasan.saldo_online.toLocaleString('id-ID')}</h5>
+            </div>
+          </div>
+        </div>
+
+        {/* Card for belanja balance */}
+        <div className="card bg-red-600  col-span-2 text-white">
+          <div className="card-body cursor-pointer">
+            <h4 className="card-title text-center text-base"> Total Pengeluaran</h4>
+            <div className="card-actions justify-center">
+              <h5>Rp. {ringkasan.pengeluaran.toLocaleString('id-ID')}</h5>
             </div>
           </div>
         </div>
