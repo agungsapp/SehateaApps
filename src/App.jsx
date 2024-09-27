@@ -9,6 +9,7 @@ import Pengeluaran from './pages/Pengeluaran';
 import History from './pages/History';
 import { useEffect, useState } from 'react';
 import SplashScreen from './components/SplashScreen';
+import EditTransaksi from './pages/EditTransaksi';
 
 function App() {
 
@@ -41,6 +42,7 @@ function App() {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/transaksi" element={<Transaksi />} />
+            <Route path="/edit-transaksi/:id" element={<EditTransaksi />} />
             <Route path="/history" element={<History />} />
             <Route path="/pengeluaran" element={<Pengeluaran />} />
           </Routes>
