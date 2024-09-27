@@ -55,9 +55,9 @@ function App() {
         <div className="drawer-side">
           <label htmlFor="my-drawer" className="drawer-overlay"></label>
           <ul className="menu p-4 w-60 h-full bg-base-100 text-base-content">
-            <li><a href="#">Homepage</a></li>
-            <li><a href="#">Portfolio</a></li>
-            <li><a href="#">About</a></li>
+            <li><a href="#">Data Produk <div className="badge badge-secondary">proses</div></a></li>
+            <li><a href="#">Data Bahan Baku <div className="badge badge-secondary">proses</div></a></li>
+            <li><a href="#">Laporan Transaksi <div className="badge badge-secondary">proses</div></a></li>
           </ul>
         </div>
       </div>
