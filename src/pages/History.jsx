@@ -81,7 +81,7 @@ const History = () => {
                   </div>
                 </p>
 
-                <p className="absolute bg-green-600 top-0 right-0 px-2 py-1 rounded-es-xl text-white font-bold">
+                <p className="absolute  text-sm bg-green-600 top-0 right-0 px-2 py-1 rounded-es-xl text-white font-bold">
                   {new Date(trx.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                 </p>
 
@@ -101,7 +101,7 @@ const History = () => {
                 <p className='font-bold text-slate-700'>{detail.produk.nama}</p>
                 <p>Jumlah: {detail.qty}</p>
                 <p>Subtotal: Rp {parseInt(detail.subtotal).toLocaleString()}</p>
-                <p className='absolute bg-green-600 top-0 right-0 px-2 py-1 rounded-es-xl text-white font-bold'> {new Date(detail.created_at).toLocaleString([], { hour: '2-digit', minute: '2-digit' })}</p>
+                <p className='absolute text-sm bg-green-600 top-0 right-0 px-2 py-1 rounded-es-xl text-white font-bold'> {new Date(detail.created_at).toLocaleString([], { hour: '2-digit', minute: '2-digit' })}</p>
               </div>
             ))}
           </div>
