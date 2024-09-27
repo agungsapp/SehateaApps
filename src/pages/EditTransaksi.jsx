@@ -2,6 +2,7 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Swal from 'sweetalert2';
+import { BiSave, BiSolidTrash } from "react-icons/bi";
 
 const EditTransaksi = () => {
   const { id } = useParams();
@@ -126,7 +127,7 @@ const EditTransaksi = () => {
   if (error) return <p className="text-red-500">{error}</p>;
 
   return (
-    <div className="p-4">
+    <div className="p-4 pb-36">
       <h1 className="text-2xl font-bold mb-4">Edit Transaksi</h1>
       <form onSubmit={handleSubmit}>
         {transaksi.map((detail, index) => (
@@ -164,17 +165,17 @@ const EditTransaksi = () => {
               <div className="card-actions justify-end mt-2">
                 <button
                   type="button"
-                  className="btn btn-error"
+                  className="btn btn-error text-white"
                   onClick={() => handleDeleteDetail(detail.id, index)}
                 >
-                  Hapus
+                  <BiSolidTrash /> Hapus
                 </button>
               </div>
             </div>
           </div>
         ))}
         <div className="mt-4">
-          <button type="submit" className="btn btn-primary" disabled={isLoading}>
+          <button type="submit" className="btn btn-primary" disabled={isLoading}><BiSave />
             {isLoading ? "Menyimpan..." : "Simpan Perubahan"}
           </button>
         </div>
