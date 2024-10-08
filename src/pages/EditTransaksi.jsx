@@ -131,7 +131,7 @@ const EditTransaksi = () => {
       <h1 className="text-2xl font-bold mb-4">Edit Transaksi</h1>
       <form onSubmit={handleSubmit}>
         {transaksi.map((detail, index) => (
-          <div key={detail.id} className="card bg-base-100 w-full shadow-xl mb-4">
+          <div key={detail.id} className="card border-l-4 border-t-2 border-green-600 bg-base-100 w-full shadow-xl mb-4">
             <div className="card-body">
               <h2 className="card-title">Kode: {detail.kode}</h2>
               <div className="form-control">

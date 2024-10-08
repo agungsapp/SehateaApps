@@ -6,11 +6,11 @@ const BottomNav = () => {
   const location = useLocation(); // Get the current location
 
   return (
-    <div className="btm-nav border-slate-200 border-t-2">
+    <div className="btm-nav bg-green-700 text-white border-slate-200 border-t-2">
       <button
         onClick={() => navigate('/')}
-        className={`flex flex-col items-center justify-center w-full py-2 ${location.pathname === '/'
-          ? 'border-t-4 border-green-500 text-green-600  '
+        className={`flex flex-col font-bold items-center justify-center w-full py-2 ${location.pathname === '/'
+          ? 'border-t-4 border-green-500 bg-green-100 text-slate-700'
           : 'border-t-2 border-transparent'
           }`}
       >
@@ -19,8 +19,8 @@ const BottomNav = () => {
       </button>
       <button
         onClick={() => navigate('/transaksi')}
-        className={`flex flex-col items-center justify-center w-full py-2 ${location.pathname === '/transaksi'
-          ? 'border-t-4 border-green-500 text-green-600  '
+        className={`flex flex-col font-bold items-center justify-center w-full py-2 ${location.pathname === '/transaksi'
+          ? 'border-t-4 border-green-500 bg-green-100 text-slate-700  '
           : 'border-t-2 border-transparent'
           }`}
       >
@@ -29,8 +29,8 @@ const BottomNav = () => {
       </button>
       <button
         onClick={() => navigate('/history')}
-        className={`flex flex-col items-center justify-center w-full py-2 ${location.pathname === '/history'
-          ? 'border-t-4 border-green-500 text-green-600  '
+        className={`flex flex-col font-bold items-center justify-center w-full py-2 ${location.pathname === '/history'
+          ? 'border-t-4 border-green-500 bg-green-100 text-slate-700'
           : 'border-t-2 border-transparent'
           }`}
       >
@@ -39,8 +39,8 @@ const BottomNav = () => {
       </button>
       <button
         onClick={() => navigate('/pengeluaran')}
-        className={`flex flex-col items-center justify-center w-full py-2 ${location.pathname === '/pengeluaran'
-          ? 'border-t-4 border-green-500 text-green-600  '
+        className={`flex flex-col font-bold items-center justify-center w-full py-2 ${location.pathname === '/pengeluaran'
+          ? 'border-t-4 border-green-500 bg-green-100 text-slate-700'
           : 'border-t-2 border-transparent'
           }`}
       >

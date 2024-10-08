@@ -37,8 +37,8 @@ const History = () => {
   };
 
   return (
-    <div className="p-4">
-      <h1 className="font-bold text-lg">Riwayat Transaksi</h1>
+    <div className="p-4 pb-36">
+      <h1 className="font-bold text-lg mb-5">Riwayat Transaksi</h1>
 
       <div role="tablist" className="tabs tabs-boxed">
         <a
