@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import Swal from 'sweetalert2';
+import { BiSolidPencil } from 'react-icons/bi';
+import { Link } from 'react-router-dom';
 
 const Pengeluaran = () => {
   const [bahanList, setBahanList] = useState([]);
@@ -225,6 +227,7 @@ const Pengeluaran = () => {
               <h2 className="card-title">{pengeluaran.bahan.nama}</h2>
               <p>{pengeluaran.qty} x Rp.{pengeluaran.harga_satuan}</p>
               <p>Subtotal: Rp.{pengeluaran.subtotal}</p>
+              <Link className="absolute bg-orange-600 bottom-3 right-4 rounded-md p-3 text-white font-bold" to={`/pengeluaran/${pengeluaran.id}`}><BiSolidPencil /></Link>
             </div>
           </div>
         ))
