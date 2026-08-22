@@ -9,6 +9,8 @@ const Pengeluaran = () => {
   const [bahanId, setBahanId] = useState('');
   const [hargaSatuan, setHargaSatuan] = useState(0);
   const [qty, setQty] = useState(1); // Default quantity 1
+  const [isiPerSatuan, setIsiPerSatuan] = useState(1); // Default isi per satuan 1
+  const [keterangan, setKeterangan] = useState('');
   const [subtotal, setSubtotal] = useState(0);
   const [pengeluaranList, setPengeluaranList] = useState([]); // Menyimpan daftar pengeluaran hari ini
 
@@ -52,7 +54,7 @@ const Pengeluaran = () => {
     const selectedBahan = bahanList.find((bahan) => bahan.id === parseInt(e.target.value));
     if (selectedBahan) {
       setBahanId(selectedBahan.id);
-      setHargaSatuan(selectedBahan.harga); // Set harga satuan dari bahan, tetapi tetap bisa diubah
+      setHargaSatuan(Math.round(Number(selectedBahan.harga))); // Set harga satuan dari bahan, tetapi tetap bisa diubah
     }
   };
 
@@ -63,14 +65,23 @@ const Pengeluaran = () => {
     }
   };
 
+  // Handler untuk mengubah isi per satuan
+  const handleIsiSatuanChange = (value) => {
+    if (value >= 1) {
+      setIsiPerSatuan(value);
+    }
+  };
+
   // Handler untuk submit form pengeluaran
   const handleSubmit = async (e) => {
     e.preventDefault();
     const data = {
       bahan_id: bahanId,
       qty,
+      isi_per_satuan: isiPerSatuan,
       harga_satuan: hargaSatuan,
       subtotal,
+      keterangan,
     };
 
     try {
@@ -85,8 +96,10 @@ const Pengeluaran = () => {
       // Reset form jika berhasil
       setBahanId('');
       setQty(1);
+      setIsiPerSatuan(1);
       setHargaSatuan(0);
       setSubtotal(0);
+      setKeterangan('');
 
       // Muat ulang data pengeluaran
       const fetchPengeluaran = await axios.get(`${baseURL}/api/pengeluaran`);
@@ -160,7 +173,7 @@ const Pengeluaran = () => {
                 id="harga_satuan"
                 type="number"
                 value={hargaSatuan}
-                onChange={(e) => setHargaSatuan(Number(e.target.value))} // Mengizinkan inputan pengguna
+                onChange={(e) => setHargaSatuan(Math.max(0, Number(e.target.value)))} // Mengizinkan inputan pengguna
                 className="input input-bordered input-success mt-2 w-full max-w-xs"
               />
             </div>
@@ -194,6 +207,48 @@ const Pengeluaran = () => {
               </div>
             </div>
 
+            {/* Input untuk Isi per Satuan */}
+            <div className="mb-3">
+              <label htmlFor="isi_per_satuan">Isi per Satuan (pcs)</label>
+              <div className="flex items-center space-x-2 mt-2">
+                <button
+                  type="button"
+                  className="btn btn-sm bg-red-600 text-white"
+                  onClick={() => handleIsiSatuanChange(isiPerSatuan - 1)}
+                >
+                  -
+                </button>
+                <input
+                  id="isi_per_satuan"
+                  type="number"
+                  value={isiPerSatuan}
+                  onChange={(e) => handleIsiSatuanChange(parseInt(e.target.value))}
+                  className="input input-bordered w-16 text-center"
+                  min="1"
+                />
+                <button
+                  type="button"
+                  className="btn btn-sm bg-green-600 text-white"
+                  onClick={() => handleIsiSatuanChange(isiPerSatuan + 1)}
+                >
+                  +
+                </button>
+              </div>
+            </div>
+
+            {/* Input untuk Keterangan */}
+            <div className="mb-3">
+              <label htmlFor="keterangan">Keterangan</label>
+              <input
+                id="keterangan"
+                type="text"
+                value={keterangan}
+                onChange={(e) => setKeterangan(e.target.value)}
+                placeholder="Opsional"
+                className="input input-bordered input-success mt-2 w-full max-w-xs"
+              />
+            </div>
+
             {/* Subtotal */}
             <div className="mb-3">
               <p className="text-end">Subtotal: {subtotal}</p>
@@ -225,7 +280,13 @@ const Pengeluaran = () => {
           <div key={pengeluaran.id} className="card bg-base-100 w-full mt-5 shadow-xl">
             <div className="card-body">
               <h2 className="card-title">{pengeluaran.bahan.nama}</h2>
-              <p>{pengeluaran.qty} x Rp.{pengeluaran.harga_satuan}</p>
+              <p>
+                {pengeluaran.qty} x Rp.{pengeluaran.harga_satuan}
+              </p>
+              <p>
+                {pengeluaran.qty} x {pengeluaran.isi_per_satuan || 1} pcs
+              </p>
+              {pengeluaran.keterangan && <p>Keterangan: {pengeluaran.keterangan}</p>}
               <p>Subtotal: Rp.{pengeluaran.subtotal}</p>
               <Link className="absolute bg-orange-600 bottom-3 right-4 rounded-md p-3 text-white font-bold" to={`/pengeluaran/${pengeluaran.id}`}><BiSolidPencil /></Link>
             </div>

@@ -21,7 +21,15 @@ const EditPengeluaran = () => {
   const fetchPengeluaran = async () => {
     try {
       const response = await axios.get(`${baseURL}/api/pengeluaran/${id}`);
-      setPengeluaran(response.data.data);
+      const data = response.data.data;
+      setPengeluaran({
+        ...data,
+        qty: data.qty || 1,
+        isi_per_satuan: data.isi_per_satuan || 1,
+        harga_satuan: Math.round(Number(data.harga_satuan || 0)),
+        keterangan: data.keterangan || '',
+        subtotal: data.subtotal || 0,
+      });
       setIsLoading(false);
     } catch (error) {
       console.error('Error fetching pengeluaran:', error);
@@ -40,6 +48,9 @@ const EditPengeluaran = () => {
   };
 
   const handleFieldChange = (field, value) => {
+    if (field === 'qty' && value < 1) return;
+    if (field === 'isi_per_satuan' && value < 1) return;
+    if (field === 'harga_satuan' && value < 0) return;
     setPengeluaran(prev => ({
       ...prev,
       [field]: value,
@@ -62,8 +73,16 @@ const EditPengeluaran = () => {
 
     if (result.isConfirmed) {
       setIsLoading(true);
+      const payload = {
+        bahan_id: pengeluaran.bahan_id,
+        qty: pengeluaran.qty,
+        isi_per_satuan: pengeluaran.isi_per_satuan,
+        harga_satuan: pengeluaran.harga_satuan,
+        subtotal: pengeluaran.subtotal,
+        keterangan: pengeluaran.keterangan || '',
+      };
       try {
-        await axios.put(`${baseURL}/api/pengeluaran/${id}`, pengeluaran);
+        await axios.put(`${baseURL}/api/pengeluaran/${id}`, payload);
         Swal.fire('Berhasil!', 'Pengeluaran telah diperbarui.', 'success');
         navigate("/pengeluaran");
       } catch (error) {
@@ -144,6 +163,28 @@ const EditPengeluaran = () => {
                 onChange={(e) => handleFieldChange('qty', parseInt(e.target.value))}
                 className="input input-bordered w-full max-w-xs"
                 min="1"
+              />
+            </div>
+
+            <div className="form-control mt-4">
+              <label className="label">Isi per Satuan (pcs):</label>
+              <input
+                type="number"
+                value={pengeluaran.isi_per_satuan || 1}
+                onChange={(e) => handleFieldChange('isi_per_satuan', parseInt(e.target.value))}
+                className="input input-bordered w-full max-w-xs"
+                min="1"
+              />
+            </div>
+
+            <div className="form-control mt-4">
+              <label className="label">Keterangan:</label>
+              <input
+                type="text"
+                value={pengeluaran.keterangan || ''}
+                onChange={(e) => handleFieldChange('keterangan', e.target.value)}
+                placeholder="Opsional"
+                className="input input-bordered w-full max-w-xs"
               />
             </div>
 
