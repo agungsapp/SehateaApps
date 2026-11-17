@@ -1,77 +1,107 @@
-import { useState, useEffect } from 'react';
-import axios from 'axios';
+import { useState, useEffect } from "react";
+import axios from "axios";
 
 const Home = () => {
-  const [ringkasan, setRingkasan] = useState({
-    total_cup: 0,
-    saldo_cash: 0,
-    saldo_online: 0,
-    pengeluaran: 0,
-  });
+    const [ringkasan, setRingkasan] = useState({
+        total_cup: 0,
+        saldo_cash: 0,
+        saldo_online: 0,
+        pengeluaran: 0,
+    });
 
-  const baseURL = import.meta.env.VITE_BASE_URL;
+    const baseURL = import.meta.env.VITE_BASE_URL;
 
-  // Fetch data using Axios
-  useEffect(() => {
-    const fetchRingkasan = async () => {
-      try {
-        const response = await axios.get(`${baseURL}/api/ringkasan`);
-        setRingkasan(response.data.data);
-      } catch (error) {
-        console.error('Error fetching data:', error);
-      }
-    };
+    // Fetch data using Axios
+    useEffect(() => {
+        const fetchRingkasan = async () => {
+            try {
+                const response = await axios.get(`${baseURL}/api/ringkasan`);
+                setRingkasan(response.data.data);
+            } catch (error) {
+                console.error("Error fetching data:", error);
+            }
+        };
 
-    fetchRingkasan();
-  }, [baseURL]);
+        fetchRingkasan();
+    }, [baseURL]);
 
-  return (
-    <div className="p-4">
-      <h1 className='mb-3 text-2xl font-bold'>Dashboard</h1>
-      <div className="grid grid-cols-2 gap-2">
-        {/* Card for total cups sold */}
-        <div className="card bg-orange-600 text-white col-span-2">
-          <div className="card-body">
-            <h4 className="card-title text-center text-base">Total Cup Terjual</h4>
-            <div className="card-actions justify-center">
-              <h5>{ringkasan.total_cup} Cup</h5>
+    return (
+        <div className="p-4">
+            <h1 className="mb-3 text-2xl font-bold">Dashboard</h1>
+            <div className="grid grid-cols-2 gap-2">
+                {/* Card for total cups sold */}
+                <div className="card bg-orange-600 text-white col-span-2">
+                    <div className="card-body">
+                        <h4 className="card-title text-center text-base">
+                            Total Cup Terjual
+                        </h4>
+                        <div className="card-actions justify-center">
+                            <h5>{ringkasan.total_cup} Cup</h5>
+                        </div>
+                    </div>
+                </div>
+                {/* Card for cash balance */}
+                <div className="card bg-green-600 text-white">
+                    <div className="card-body cursor-pointer">
+                        <h4 className="card-title text-center text-base">
+                            Uang Cash
+                        </h4>
+                        <div className="card-actions justify-center">
+                            <h5>
+                                Rp.{" "}
+                                {ringkasan.saldo_cash.toLocaleString("id-ID")}
+                            </h5>
+                        </div>
+                    </div>
+                </div>
+                {/* Card for online balance */}
+                <div className="card bg-blue-600 text-white">
+                    <div className="card-body cursor-pointer">
+                        <h4 className="card-title text-center text-base">
+                            Saldo Online
+                        </h4>
+                        <div className="card-actions justify-center">
+                            <h5>
+                                Rp.{" "}
+                                {ringkasan.saldo_online.toLocaleString("id-ID")}
+                            </h5>
+                        </div>
+                    </div>
+                </div>
+                {/* Card for belanja balance */}
+                <div className="card bg-red-600  col-span-2 text-white">
+                    <div className="card-body cursor-pointer">
+                        <h4 className="card-title text-center text-base">
+                            {" "}
+                            Total Pengeluaran
+                        </h4>
+                        <div className="card-actions justify-center">
+                            <h5>
+                                Rp.{" "}
+                                {ringkasan.pengeluaran.toLocaleString("id-ID")}
+                            </h5>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Card for expense reminder */}
+                <div className="card col-span-2 mt-8 border-2 border-dashed border-yellow-500 bg-yellow-100 text-yellow-800 animate-wiggle">
+                    <div className="card-body flex-row items-center gap-3 p-4">
+                        <div className="text-2xl">📢</div>
+                        <div>
+                            <h4 className="font-bold text-sm">
+                                Catatan Penting!
+                            </h4>
+                            <p className="text-sm">
+                                Please jangan lupa segera input pengeluaran, ya
+                                :)
+                            </p>
+                        </div>
+                    </div>
+                </div>
             </div>
-          </div>
         </div>
-
-        {/* Card for cash balance */}
-        <div className="card bg-green-600 text-white">
-          <div className="card-body cursor-pointer">
-            <h4 className="card-title text-center text-base">Uang Cash</h4>
-            <div className="card-actions justify-center">
-              <h5>Rp. {ringkasan.saldo_cash.toLocaleString('id-ID')}</h5>
-            </div>
-          </div>
-        </div>
-
-        {/* Card for online balance */}
-        <div className="card bg-blue-600 text-white">
-          <div className="card-body cursor-pointer">
-            <h4 className="card-title text-center text-base">Saldo Online</h4>
-            <div className="card-actions justify-center">
-              <h5>Rp. {ringkasan.saldo_online.toLocaleString('id-ID')}</h5>
-            </div>
-          </div>
-        </div>
-
-        {/* Card for belanja balance */}
-        <div className="card bg-red-600  col-span-2 text-white">
-          <div className="card-body cursor-pointer">
-            <h4 className="card-title text-center text-base"> Total Pengeluaran</h4>
-            <div className="card-actions justify-center">
-              <h5>Rp. {ringkasan.pengeluaran.toLocaleString('id-ID')}</h5>
-            </div>
-          </div>
-        </div>
-
-      </div>
-    </div>
-  );
+    );
 };
 
 export default Home;

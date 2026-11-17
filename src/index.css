@@ -10,3 +10,48 @@
         rgba(0, 128, 0, 1) 95%
     );
 }
+
+@keyframes breathe {
+    0%,
+    100% {
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(234, 179, 8, 0.15);
+    }
+
+    50% {
+        transform: scale(1.02);
+        box-shadow: 0 0 12px 3px rgba(234, 179, 8, 0.3);
+    }
+}
+
+.animate-breathe {
+    animation: breathe 2.5s ease-in-out infinite;
+}
+
+@keyframes wiggle {
+    0%,
+    100% {
+        transform: rotate(0deg);
+    }
+
+    20% {
+        transform: rotate(-1deg);
+    }
+
+    40% {
+        transform: rotate(1deg);
+    }
+
+    60% {
+        transform: rotate(-1deg);
+    }
+
+    80% {
+        transform: rotate(1deg);
+    }
+}
+
+.animate-wiggle {
+    animation: wiggle 1.5s ease-in-out infinite;
+    transform-origin: center;
+}
